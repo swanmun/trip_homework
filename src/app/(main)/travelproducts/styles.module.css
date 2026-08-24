@@ -1,0 +1,334 @@
+.page {
+  min-height: 100vh;
+  background-color: #ffffff;
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+/* 추천 숙소 */
+.recommendSection {
+  padding-top: 26px;
+}
+
+.sectionTitle {
+  margin: 0 0 14px;
+  color: #111111;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.recommendList {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.recommendCard {
+  position: relative;
+  height: 350px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.cardImage {
+  object-fit: cover;
+}
+
+.cardDark {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0%) 40%,
+    rgb(0 0 0 / 75%) 100%
+  );
+}
+
+.recommendText {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  z-index: 1;
+  color: #ffffff;
+}
+
+.recommendText h2 {
+  margin: 0 0 5px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.recommendText p {
+  overflow: hidden;
+  margin: 0 0 8px;
+  font-size: 10px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.recommendText strong {
+  display: block;
+  text-align: right;
+  font-size: 16px;
+}
+
+/* 중간 프로모션 배너 */
+.promotion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  min-height: 120px;
+  margin: 36px 0;
+  padding: 20px 28px;
+
+  border-radius: 10px;
+  background-color: #d5d6bc;
+  text-align: right;
+}
+
+.promotionText span {
+  display: inline-block;
+  padding: 5px 8px;
+
+  border-radius: 4px;
+  background-color: #aaa98c;
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.promotionText h2 {
+  margin: 8px 0 0;
+  color: #111111;
+  font-size: 19px;
+  line-height: 1.35;
+}
+
+/* 숙박 상품 목록 */
+.productsSection {
+  padding-bottom: 80px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tabs button {
+  padding: 8px 12px;
+
+  border: 0;
+  border-radius: 5px;
+  background-color: transparent;
+  color: #777777;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.tabs .activeTab {
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.searchArea {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.searchArea input {
+  height: 36px;
+  padding: 0 10px;
+
+  border: 1px solid #eeeeee;
+  border-radius: 5px;
+  background-color: #f7f7f7;
+  color: #111111;
+  font-size: 11px;
+}
+
+.searchArea input:first-child {
+  width: 170px;
+}
+
+.searchArea input:nth-child(2) {
+  flex: 1;
+}
+
+.searchButton,
+.sellButton {
+  height: 36px;
+  padding: 0 13px;
+
+  border: 0;
+  border-radius: 5px;
+  color: #ffffff;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.searchButton {
+  background-color: #111111;
+}
+
+.sellButton {
+  background-color: #2877d5;
+}
+
+/* 숙소 종류 버튼 */
+.categoryList {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.categoryList button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+
+  border: 0;
+  background-color: transparent;
+  color: #222222;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.categoryIcon {
+  display: block;
+  font-size: 21px;
+}
+
+/* 상품 카드 */
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px 12px;
+}
+
+.productCard {
+  min-width: 0;
+}
+
+.productImage {
+  position: relative;
+  height: 170px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.bookmark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  padding: 3px 5px;
+
+  border-radius: 4px;
+  background-color: rgb(0 0 0 / 45%);
+  color: #ffffff;
+  font-size: 10px;
+}
+
+.productCard h3 {
+  display: -webkit-box;
+  overflow: hidden;
+
+  margin: 9px 0 5px;
+  color: #222222;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.hashtags {
+  overflow: hidden;
+
+  margin: 0;
+  color: #3578c5;
+  font-size: 9px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.productBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-top: 10px;
+  color: #777777;
+  font-size: 10px;
+}
+
+.productBottom strong {
+  color: #111111;
+  font-size: 12px;
+}
+
+/* 모바일: 780px 이하 */
+@media (max-width: 780px) {
+  .container {
+    padding: 0 20px;
+  }
+
+  .recommendList {
+    grid-template-columns: 1fr;
+  }
+
+  .recommendCard {
+    height: 280px;
+  }
+
+  .promotion {
+    min-height: 120px;
+    margin: 28px 0;
+    padding: 18px;
+  }
+
+  .promotionText h2 {
+    font-size: 16px;
+  }
+
+  .searchArea {
+    flex-wrap: wrap;
+  }
+
+  .searchArea input:first-child,
+  .searchArea input:nth-child(2) {
+    width: 100%;
+    flex: none;
+  }
+
+  .searchButton,
+  .sellButton {
+    flex: 1;
+  }
+
+  .categoryList {
+    grid-template-columns: repeat(4, 1fr);
+    row-gap: 18px;
+  }
+
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 12px;
+  }
+
+  .productImage {
+    height: 170px;
+  }
+}
