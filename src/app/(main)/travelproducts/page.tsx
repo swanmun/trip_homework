@@ -113,7 +113,7 @@ export default function TravelProductsPage() {
                 />
 
                 <div className={styles.cardDark} />
-
+                <span className={styles.bookmark}>♡ 24</span>
                 <div className={styles.recommendText}>
                   <h2>{product.title}</h2>
                   <p>{product.description}</p>
@@ -148,21 +148,13 @@ export default function TravelProductsPage() {
               예약 가능한 숙소
             </button>
 
-            <button type="button">
-              예약 마감 숙소
-            </button>
+            <button type="button">예약 마감 숙소</button>
           </div>
 
           <div className={styles.searchArea}>
-            <input
-              type="text"
-              placeholder="YYYY. MM. DD - YYYY. MM. DD"
-            />
+            <input type="text" placeholder="YYYY. MM. DD - YYYY. MM. DD" />
 
-            <input
-              type="text"
-              placeholder="제목을 검색해 주세요."
-            />
+            <input type="text" placeholder="제목을 검색해 주세요." />
 
             <button type="button" className={styles.searchButton}>
               검색
@@ -198,9 +190,7 @@ export default function TravelProductsPage() {
 
                 <h3>{product.title}</h3>
 
-                <p className={styles.hashtags}>
-                  {product.hashtags}
-                </p>
+                <p className={styles.hashtags}>{product.hashtags}</p>
 
                 <div className={styles.productBottom}>
                   <span>● 남는트립</span>
