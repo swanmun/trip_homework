@@ -45,6 +45,7 @@ export default function Header() {
   const point = user?.userPoint?.amount ?? 0;
   const isTripTalkPage = pathname === "/" || pathname.startsWith("/boards");
   const isTravelProductsPage = pathname.startsWith("/travelproducts");
+  const isMyPage = pathname.startsWith("/mypage");
 
   return (
     <header className={styles.header}>
@@ -65,7 +66,9 @@ export default function Header() {
           >
             숙박권 구매
           </Link>
-          <span>마이 페이지</span>
+          <Link className={isMyPage ? styles.active : ""} href="/mypage">
+            마이페이지
+          </Link>
         </nav>
 
         {accessToken === "" ? (
@@ -82,7 +85,9 @@ export default function Header() {
               onClick={() => setIsMenuOpen((prev) => !prev)}
             >
               <span className={styles.profileAvatar}>👤</span>
-              <span className={styles.profileArrow}>{isMenuOpen ? "▴" : "▾"}</span>
+              <span className={styles.profileArrow}>
+                {isMenuOpen ? "▴" : "▾"}
+              </span>
             </button>
 
             {isMenuOpen && (
@@ -107,7 +112,11 @@ export default function Header() {
                   포인트 충전
                 </button>
 
-                <button className={styles.menuRow} type="button" onClick={onClickLogout}>
+                <button
+                  className={styles.menuRow}
+                  type="button"
+                  onClick={onClickLogout}
+                >
                   <span className={styles.menuIcon}>↪</span>
                   로그아웃
                 </button>
