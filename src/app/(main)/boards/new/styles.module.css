@@ -1,4 +1,4 @@
-.page {
+/* .page {
   width: calc(100% - 40px);
   max-width: 1280px;
   min-height: 700px;
@@ -9,4 +9,210 @@
 .page h1 {
   margin: 0;
   font-size: 28px;
+} */
+
+.page {
+  min-height: 100vh;
+  /* background: #f3f3f3; */
+  color: #222;
+}
+
+.screen {
+  width: min(100%, 1120px);
+  min-height: 100vh;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.container {
+  width: min(100% - 64px, 920px);
+  margin: 0 auto;
+  padding: 56px 0 48px;
+}
+
+.title {
+  margin: 0 0 42px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 31px;
+}
+
+.authorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.field,
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section {
+  padding-top: 26px;
+  border-top: 1px solid #eee;
+}
+
+.field label,
+.section > label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field label span,
+.section label span {
+  color: #ed4b4b;
+}
+
+.input,
+.field input,
+.section input,
+.section textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e2e2e2;
+  border-radius: 6px;
+  background: #fff;
+  color: #222;
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.field input,
+.section input {
+  height: 38px;
+  padding: 0 13px;
+}
+
+.section textarea {
+  min-height: 248px;
+  padding: 13px;
+  resize: vertical;
+}
+
+.field input:focus,
+.section input:focus,
+.section textarea:focus {
+  border-color: #777;
+}
+
+.addressSearch {
+  display: flex;
+  gap: 7px;
+}
+
+.addressSearch .postcode {
+  width: 62px;
+}
+
+.searchButton,
+.cancelButton,
+.submitButton {
+  height: 38px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #fff;
+  padding: 0 13px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.addressSearch + input,
+.addressSearch ~ input {
+  margin-top: 0;
+}
+
+.imageList {
+  display: flex;
+  gap: 12px;
+}
+
+.uploadBox,
+.imageBox {
+  position: relative;
+  display: flex;
+  width: 116px;
+  height: 116px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #f4f4f4;
+  color: #777;
+  cursor: pointer;
+  text-align: center;
+  font-size: 11px;
+}
+
+.uploadBox {
+  flex-direction: column;
+  gap: 8px;
+}
+
+.plus {
+  color: #555;
+  font-size: 25px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.imageBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.imageBox button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 65%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 3px;
+}
+
+.cancelButton {
+  border-color: #222;
+}
+
+.submitButton {
+  border-color: #cfcfcf;
+  background: #cfcfcf;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .container {
+    width: min(100% - 32px, 920px);
+    padding-top: 32px;
+  }
+
+  .authorRow {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .imageList {
+    flex-wrap: wrap;
+  }
 }
