@@ -1,6 +1,7 @@
 import Image from "next/image";
 import HeroBanner from "@/components/home/hero-banner";
 import styles from "./styles.module.css";
+import Link from "next/dist/client/link";
 
 const recommendedProducts = [
   {
@@ -160,9 +161,9 @@ export default function TravelProductsPage() {
               검색
             </button>
 
-            <button type="button" className={styles.sellButton}>
+            <Link className={styles.sellButton} href="\travelproducts\sell">
               숙박권 판매하기
-            </button>
+            </Link>
           </div>
 
           <div className={styles.categoryList}>

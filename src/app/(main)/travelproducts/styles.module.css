@@ -165,13 +165,17 @@
 
 .searchButton,
 .sellButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   height: 36px;
   padding: 0 13px;
-
   border: 0;
   border-radius: 5px;
   color: #ffffff;
   font-size: 11px;
+  line-height: 1;
   cursor: pointer;
 }
 
@@ -181,6 +185,7 @@
 
 .sellButton {
   background-color: #2877d5;
+  
 }
 
 /* 숙소 종류 버튼 */

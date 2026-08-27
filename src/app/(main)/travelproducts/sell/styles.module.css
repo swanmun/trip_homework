@@ -1,0 +1,248 @@
+.page {
+  min-height: 100vh;
+  background: #fff;
+  color: #222;
+}
+
+.container {
+  width: min(100% - 40px, 920px);
+  margin: 0 auto;
+  padding: 48px 0 48px;
+}
+
+.title {
+  margin: 0 0 38px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding-top: 24px;
+  border-top: 1px solid #eee;
+}
+
+.section:first-of-type {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.section label,
+.addressFields label,
+.mapArea label {
+  color: #222;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.section label span,
+.addressFields label span {
+  color: #e54b4b;
+}
+
+.section input,
+.addressFields input {
+  width: 100%;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+  outline: none;
+  font-size: 10px;
+}
+
+.section input:focus,
+.addressFields input:focus,
+.section textarea:focus {
+  border-color: #999;
+}
+
+.editor {
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
+  border-radius: 5px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  height: 36px;
+  padding: 0 13px;
+  border-bottom: 1px solid #eee;
+  color: #222;
+  font-size: 11px;
+}
+
+.toolbar span {
+  min-width: 8px;
+  text-align: center;
+}
+
+.editor textarea {
+  display: block;
+  width: 100%;
+  min-height: 205px;
+  box-sizing: border-box;
+  padding: 13px 10px;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  font: inherit;
+  font-size: 10px;
+}
+
+.addressSection {
+  display: grid;
+  grid-template-columns: 172px 1fr;
+  gap: 18px;
+  padding: 25px 0 16px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.addressFields {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.postcodeRow {
+  display: flex;
+  gap: 6px;
+}
+
+.postcodeRow input {
+  width: 42px;
+}
+
+.postcodeRow button {
+  height: 36px;
+  padding: 0 9px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #fff;
+  font-size: 10px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.addressFields input[readonly] {
+  border: 0;
+  background: #e4e4e4;
+}
+
+.mapArea {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.mapPlaceholder {
+  display: flex;
+  min-height: 135px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: #e4e4e4;
+  color: #777;
+  font-size: 10px;
+}
+
+.imageArea {
+  min-height: 70px;
+}
+
+.uploadBox,
+.previewBox {
+  position: relative;
+  display: flex;
+  width: 70px;
+  height: 70px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #f3f3f3;
+  color: #777;
+  cursor: pointer;
+  text-align: center;
+  font-size: 9px;
+}
+
+.uploadBox {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.plus {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.previewBox img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewBox button {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 65%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.cancelButton,
+.submitButton {
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.cancelButton {
+  border: 1px solid #222;
+  background: #fff;
+}
+
+.submitButton {
+  border: 1px solid #ccc;
+  background: #ccc;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .container {
+    width: min(100% - 32px, 920px);
+    padding-top: 32px;
+  }
+
+  .addressSection {
+    grid-template-columns: 1fr;
+  }
+}
