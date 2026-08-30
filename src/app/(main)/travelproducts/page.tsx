@@ -1,7 +1,7 @@
 import Image from "next/image";
 import HeroBanner from "@/components/home/hero-banner";
 import styles from "./styles.module.css";
-import Link from "next/dist/client/link";
+import Link from "next/link";
 
 const recommendedProducts = [
   {
@@ -161,7 +161,7 @@ export default function TravelProductsPage() {
               검색
             </button>
 
-            <Link className={styles.sellButton} href="\travelproducts\sell">
+            <Link className={styles.sellButton} href="/travelproducts/sell">
               숙박권 판매하기
             </Link>
           </div>
@@ -177,7 +177,10 @@ export default function TravelProductsPage() {
 
           <div className={styles.productGrid}>
             {products.map((product) => (
-              <article className={styles.productCard} key={product.id}>
+              <Link
+                href={`/travelproducts/${product.id}`}
+                className={styles.productCard}
+              >
                 <div className={styles.productImage}>
                   <Image
                     src={product.image}
@@ -190,14 +193,13 @@ export default function TravelProductsPage() {
                 </div>
 
                 <h3>{product.title}</h3>
-
                 <p className={styles.hashtags}>{product.hashtags}</p>
 
                 <div className={styles.productBottom}>
                   <span>● 남는트립</span>
                   <strong>{product.price}</strong>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </section>
