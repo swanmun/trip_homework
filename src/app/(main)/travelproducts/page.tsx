@@ -1,83 +1,15 @@
+"use client";
+
+import { useQuery } from "@apollo/client/react";
 import Image from "next/image";
-import HeroBanner from "@/components/home/hero-banner";
-import styles from "./styles.module.css";
 import Link from "next/link";
+import { useState, type FormEvent } from "react";
 
-const recommendedProducts = [
-  {
-    id: 1,
-    image: "/images/stay-1.png",
-    title: "포항 : 당장 가고 싶은 숙소",
-    description: "살어리 살어리랏다 청산에 살어리랏다",
-    price: "32,900원",
-  },
-  {
-    id: 2,
-    image: "/images/stay-2.png",
-    title: "강릉 : 마음까지 깨끗해지는 하얀 숙소",
-    description: "강릉의 푸른 바다와 함께하는 특별한 하루",
-    price: "32,900원",
-  },
-];
+import HeroBanner from "@/components/home/hero-banner";
+import { FETCH_TRAVELPRODUCTS } from "@/graphql/queries";
+import type { Travelproduct } from "@/types/travelproduct";
 
-const products = [
-  {
-    id: 1,
-    image: "/images/stay-1.png",
-    title: "살어리 살어리랏다 청산에 살어리랏다",
-    hashtags: "#강릉 여행 #숙소 추천 #바다",
-    price: "32,900원",
-  },
-  {
-    id: 2,
-    image: "/images/stay-1.png",
-    title: "바다를 보며 쉬어가는 감성 숙소",
-    hashtags: "#오션뷰 #감성 숙소 #여행",
-    price: "32,900원",
-  },
-  {
-    id: 3,
-    image: "/images/stay-1.png",
-    title: "조용한 휴식을 위한 특별한 숙소",
-    hashtags: "#조용한 숙소 #힐링 #휴식",
-    price: "32,900원",
-  },
-  {
-    id: 4,
-    image: "/images/stay-1.png",
-    title: "이번 주말 떠나기 좋은 숙소",
-    hashtags: "#주말 여행 #국내 여행 #호텔",
-    price: "32,900원",
-  },
-  {
-    id: 5,
-    image: "/images/stay-1.png",
-    title: "여유롭게 머물기 좋은 숙소",
-    hashtags: "#여유 #휴가 #추천 숙소",
-    price: "32,900원",
-  },
-  {
-    id: 6,
-    image: "/images/stay-1.png",
-    title: "친구와 떠나는 주말 여행 숙소",
-    hashtags: "#친구 여행 #주말 #숙박권",
-    price: "32,900원",
-  },
-  {
-    id: 7,
-    image: "/images/stay-1.png",
-    title: "따뜻한 분위기의 감성 숙소",
-    hashtags: "#감성 #숙소 #힐링 여행",
-    price: "32,900원",
-  },
-  {
-    id: 8,
-    image: "/images/stay-1.png",
-    title: "나만 알고 싶은 조용한 숙소",
-    hashtags: "#숨은 숙소 #조용한 여행",
-    price: "32,900원",
-  },
-];
+import styles from "./styles.module.css";
 
 const categories = [
   "1인 전용",
@@ -90,42 +22,98 @@ const categories = [
   "바다 위 숙소",
 ];
 
+function getImageUrl(images?: string[]) {
+  const image = images?.find((item) => item !== "");
+
+  if (!image) {
+    return "/images/a.png";
+  }
+
+  if (image.startsWith("http")) {
+    return image;
+  }
+
+  return `https://storage.googleapis.com/${image}`;
+}
+
 export default function TravelProductsPage() {
+  const [keyword, setKeyword] = useState("");
+
+  const { data, loading, error, refetch } = useQuery<{
+    fetchTravelproducts: Travelproduct[];
+  }>(FETCH_TRAVELPRODUCTS, {
+    variables: {
+      page: 1,
+      search: "",
+    },
+    ssr: false,
+  });
+
+  const products = data?.fetchTravelproducts ?? [];
+  const recommendedProducts = products.slice(0, 2);
+
+  function onSubmitSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    void refetch({
+      page: 1,
+      search: keyword,
+    });
+  }
+
   return (
     <main className={styles.page}>
-      {/* 메인 페이지에서 쓰는 바다 배너를 그대로 사용 */}
       <HeroBanner />
 
       <div className={styles.container}>
-        {/* 추천 숙소 */}
         <section className={styles.recommendSection}>
           <h1 className={styles.sectionTitle}>
-            2024 끝여름 낭만있게 마무리 하고 싶다면?
+            2026 끝여름 낭만있게 마무리 하고 싶다면?
           </h1>
 
           <div className={styles.recommendList}>
             {recommendedProducts.map((product) => (
-              <article className={styles.recommendCard} key={product.id}>
+              <Link
+                key={product._id}
+                href={`/travelproducts/${product._id}`}
+                className={styles.recommendCard}
+              >
                 <Image
-                  src={product.image}
-                  alt={product.title}
+                  src={getImageUrl(product.images)}
+                  alt={product.name}
                   fill
                   className={styles.cardImage}
+                  unoptimized
                 />
 
                 <div className={styles.cardDark} />
-                <span className={styles.bookmark}>♡ 24</span>
+
+                <span className={styles.bookmark}>
+                  ♡ {product.pickedCount}
+                </span>
+
                 <div className={styles.recommendText}>
-                  <h2>{product.title}</h2>
-                  <p>{product.description}</p>
-                  <strong>{product.price}</strong>
+                  <h2>{product.name}</h2>
+                  <p>{product.remarks}</p>
+                  <strong>{product.price.toLocaleString()}원</strong>
                 </div>
-              </article>
+              </Link>
             ))}
+
+            {loading && (
+              <p className={styles.loadingText}>
+                추천 숙박권을 불러오고 있어요...
+              </p>
+            )}
+
+            {!loading && !error && recommendedProducts.length === 0 && (
+              <p className={styles.loadingText}>
+                추천 숙박권이 없습니다.
+              </p>
+            )}
           </div>
         </section>
 
-        {/* 중간 프로모션 배너 */}
         <section className={styles.promotion}>
           <div className={styles.promotionText}>
             <span>‘솔로트립’ 독점 숙소</span>
@@ -138,7 +126,6 @@ export default function TravelProductsPage() {
           </div>
         </section>
 
-        {/* 상품 목록 */}
         <section className={styles.productsSection}>
           <h2 className={styles.sectionTitle}>
             여기에서만 예약할 수 있는 숙소
@@ -152,19 +139,27 @@ export default function TravelProductsPage() {
             <button type="button">예약 마감 숙소</button>
           </div>
 
-          <div className={styles.searchArea}>
-            <input type="text" placeholder="YYYY. MM. DD - YYYY. MM. DD" />
+          <form className={styles.searchArea} onSubmit={onSubmitSearch}>
+            <input
+              type="text"
+              placeholder="YYYY. MM. DD - YYYY. MM. DD"
+            />
 
-            <input type="text" placeholder="제목을 검색해 주세요." />
+            <input
+              type="text"
+              value={keyword}
+              onChange={(event) => setKeyword(event.target.value)}
+              placeholder="제목을 검색해 주세요."
+            />
 
-            <button type="button" className={styles.searchButton}>
+            <button type="submit" className={styles.searchButton}>
               검색
             </button>
 
-            <Link className={styles.sellButton} href="/travelproducts/sell">
+            <Link className={styles.sellButton} href="/travelproducts/new">
               숙박권 판매하기
             </Link>
-          </div>
+          </form>
 
           <div className={styles.categoryList}>
             {categories.map((category) => (
@@ -176,28 +171,58 @@ export default function TravelProductsPage() {
           </div>
 
           <div className={styles.productGrid}>
+            {loading && (
+              <p className={styles.loadingText}>
+                숙박권을 불러오고 있어요...
+              </p>
+            )}
+
+            {error && (
+              <p className={styles.loadingText}>
+                숙박권을 불러오지 못했어요. API 연결을 확인해 주세요.
+              </p>
+            )}
+
+            {!loading && !error && products.length === 0 && (
+              <p className={styles.loadingText}>
+                등록된 숙박권이 없습니다.
+              </p>
+            )}
+
             {products.map((product) => (
               <Link
-                href={`/travelproducts/${product.id}`}
+                key={product._id}
+                href={`/travelproducts/${product._id}`}
                 className={styles.productCard}
               >
                 <div className={styles.productImage}>
                   <Image
-                    src={product.image}
-                    alt={product.title}
+                    src={getImageUrl(product.images)}
+                    alt={product.name}
                     fill
                     className={styles.cardImage}
+                    unoptimized
                   />
 
-                  <span className={styles.bookmark}>♡ 24</span>
+                  <span className={styles.bookmark}>
+                    ♡ {product.pickedCount}
+                  </span>
                 </div>
 
-                <h3>{product.title}</h3>
-                <p className={styles.hashtags}>{product.hashtags}</p>
+                <h3>{product.name}</h3>
+
+                <p className={styles.hashtags}>
+                  {product.tags?.join(" ") ?? ""}
+                </p>
 
                 <div className={styles.productBottom}>
-                  <span>● 남는트립</span>
-                  <strong>{product.price}</strong>
+                  <span>
+                    ● {product.seller?.name ?? "판매자"}
+                  </span>
+
+                  <strong>
+                    {product.price.toLocaleString()}원
+                  </strong>
                 </div>
               </Link>
             ))}
