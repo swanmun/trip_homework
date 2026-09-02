@@ -1,19 +1,27 @@
 "use client";
 
 import { useApolloClient, useQuery } from "@apollo/client/react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FETCH_USER_LOGGED_IN } from "@/graphql/queries";
+import { getAccessToken, removeAccessToken } from "@/lib/auth";
 import type { User } from "@/types/user";
 import styles from "./styles.module.css";
+
+const getProfileUrl = (picture?: string | null) => {
+  if (!picture) return "";
+  if (picture.startsWith("http") || picture.startsWith("/")) return picture;
+  return `https://storage.googleapis.com/${picture}`;
+};
 
 export default function Header() {
   const client = useApolloClient();
   const pathname = usePathname();
   const router = useRouter();
 
-  // 서버에는 localStorage가 없으므로 처음에는 로그아웃 상태로 시작해요.
+  // 서버에는 sessionStorage가 없으므로 처음에는 로그아웃 상태로 시작해요.
   const [accessToken, setAccessToken] = useState("");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -21,21 +29,39 @@ export default function Header() {
     // 화면이 브라우저에 나타난 다음 저장된 토큰을 확인해요.
     // 이렇게 하면 서버 화면과 브라우저의 첫 화면이 달라지는 오류를 막을 수 있어요.
     const frameId = requestAnimationFrame(() => {
-      const savedAccessToken = localStorage.getItem("accessToken") ?? "";
+      const savedAccessToken = getAccessToken();
       setAccessToken(savedAccessToken);
     });
 
     return () => cancelAnimationFrame(frameId);
   }, []);
 
-  const { data } = useQuery<{ fetchUserLoggedIn: User }>(FETCH_USER_LOGGED_IN, {
-    skip: accessToken === "",
-    ssr: false,
-  });
+  const { data, error } = useQuery<{ fetchUserLoggedIn: User }>(
+    FETCH_USER_LOGGED_IN,
+    {
+      skip: accessToken === "",
+      ssr: false,
+      fetchPolicy: "no-cache",
+    },
+  );
+
+  useEffect(() => {
+    // 서버가 만료되거나 잘못된 토큰이라고 알려주면 로그아웃 상태로 바꿔요.
+    if (!error) return;
+
+    removeAccessToken();
+    void client.clearStore();
+
+    const frameId = requestAnimationFrame(() => {
+      setAccessToken("");
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [client, error]);
 
   const onClickLogout = async () => {
     // 저장했던 토큰과 Apollo에 남아 있는 로그인 정보를 함께 지워요.
-    localStorage.removeItem("accessToken");
+    removeAccessToken();
     setAccessToken("");
     await client.clearStore();
     router.push("/");
@@ -43,6 +69,7 @@ export default function Header() {
 
   const user = data?.fetchUserLoggedIn;
   const point = user?.userPoint?.amount ?? 0;
+  const profileUrl = getProfileUrl(user?.picture);
   const isTripTalkPage = pathname === "/" || pathname.startsWith("/boards");
   const isTravelProductsPage = pathname.startsWith("/travelproducts");
   const isMyPage = pathname.startsWith("/mypage");
@@ -67,13 +94,20 @@ export default function Header() {
             숙박권 구매
           </Link>
           <Link className={isMyPage ? styles.active : ""} href="/mypage">
-            마이페이지
+            마이 페이지
           </Link>
         </nav>
 
         {accessToken === "" ? (
           <Link className={styles.loginButton} href="/login">
-            로그인 <span>›</span>
+            로그인
+            <Image
+              className={styles.loginArrow}
+              src="/icons/right_arrow.svg"
+              alt=""
+              width={18}
+              height={18}
+            />
           </Link>
         ) : (
           <div className={styles.profileArea}>
@@ -84,10 +118,20 @@ export default function Header() {
               aria-label="프로필 메뉴 열기"
               onClick={() => setIsMenuOpen((prev) => !prev)}
             >
-              <span className={styles.profileAvatar}>👤</span>
-              <span className={styles.profileArrow}>
-                {isMenuOpen ? "▴" : "▾"}
+              <span className={styles.profileAvatar}>
+                {profileUrl ? (
+                  <img src={profileUrl} alt={user?.name ?? "프로필"} />
+                ) : (
+                  <Image src="/icons/person.svg" alt="" width={24} height={24} />
+                )}
               </span>
+              <Image
+                className={styles.profileArrow}
+                src={isMenuOpen ? "/icons/up_arrow.svg" : "/icons/down_arrow.svg"}
+                alt=""
+                width={14}
+                height={14}
+              />
             </button>
 
             {isMenuOpen && (
@@ -97,27 +141,41 @@ export default function Header() {
                   type="button"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <span className={styles.menuAvatar}>👤</span>
+                  <span className={styles.menuAvatar}>
+                    {profileUrl ? (
+                      <img src={profileUrl} alt={user?.name ?? "프로필"} />
+                    ) : (
+                      <Image src="/icons/person.svg" alt="" width={24} height={24} />
+                    )}
+                  </span>
                   <strong>{user?.name ?? "로그인 사용자"}</strong>
-                  <span className={styles.menuArrow}>▴</span>
+                  <Image
+                    className={styles.menuArrow}
+                    src="/icons/up_arrow.svg"
+                    alt=""
+                    width={14}
+                    height={14}
+                  />
                 </button>
 
                 <div className={styles.menuRow}>
-                  <span className={styles.menuIcon}>▣</span>
+                  <span className={styles.menuIcon}>
+                    <Image src="/icons/point.svg" alt="" width={20} height={20} />
+                  </span>
                   <strong>{point.toLocaleString()} P</strong>
                 </div>
 
                 <button className={styles.menuRow} type="button">
-                  <span className={styles.menuIcon}>⚡</span>
+                  <span className={styles.menuIcon}>
+                    <Image src="/icons/charge.svg" alt="" width={20} height={20} />
+                  </span>
                   포인트 충전
                 </button>
 
-                <button
-                  className={styles.menuRow}
-                  type="button"
-                  onClick={onClickLogout}
-                >
-                  <span className={styles.menuIcon}>↪</span>
+                <button className={styles.menuRow} type="button" onClick={onClickLogout}>
+                  <span className={styles.menuIcon}>
+                    <Image src="/icons/logout.svg" alt="" width={20} height={20} />
+                  </span>
                   로그아웃
                 </button>
               </div>
