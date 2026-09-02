@@ -18,6 +18,22 @@ export const LOGIN_USER = gql`
   }
 `;
 
+export const CREATE_BOARD = gql`
+  mutation createBoard($input: CreateBoardInput!) {
+    createBoard(createBoardInput: $input) {
+      _id
+    }
+  }
+`;
+
+export const CREATE_TRAVELPRODUCT = gql`
+  mutation createTravelproduct($input: CreateTravelproductInput!) {
+    createTravelproduct(createTravelproductInput: $input) {
+      _id
+    }
+  }
+`;
+
 export const LIKE_BOARD = gql`
   mutation likeBoard($boardId: ID!) {
     likeBoard(boardId: $boardId)
