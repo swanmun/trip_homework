@@ -2,10 +2,10 @@
 
 import { useApolloClient, useQuery } from "@apollo/client/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import type { ReactNode } from "react";
 import { FETCH_USER_LOGGED_IN } from "@/graphql/queries";
-import { getAccessToken, removeAccessToken } from "@/lib/auth";
+import { useAuthStore } from "@/stores/auth-store";
 import styles from "./styles.module.css";
 
 type AuthGuardProps = {
@@ -15,32 +15,25 @@ type AuthGuardProps = {
 export default function AuthGuard({ children }: AuthGuardProps) {
   const router = useRouter();
   const client = useApolloClient();
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    // 화면이 열린 뒤 저장된 토큰을 확인해요.
-    const frameId = requestAnimationFrame(() => {
-      setAccessToken(getAccessToken());
-    });
-
-    return () => cancelAnimationFrame(frameId);
-  }, []);
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const isAuthReady = useAuthStore((state) => state.isAuthReady);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const { data, error } = useQuery(FETCH_USER_LOGGED_IN, {
-    skip: !accessToken,
+    skip: !isAuthReady || !accessToken,
     fetchPolicy: "no-cache",
   });
 
   useEffect(() => {
     // 토큰이 없거나 서버 검증에 실패하면 로그인 화면으로 이동해요.
-    if (accessToken === "" || error) {
-      removeAccessToken();
+    if (isAuthReady && (accessToken === "" || error)) {
+      clearAuth();
       void client.clearStore();
       router.replace("/login");
     }
-  }, [accessToken, client, error, router]);
+  }, [accessToken, clearAuth, client, error, isAuthReady, router]);
 
-  if (!data) {
+  if (!isAuthReady || !accessToken || !data) {
     return <main className={styles.loading}>로그인 정보를 확인하고 있어요.</main>;
   }
 
