@@ -38,13 +38,15 @@ function getImageUrl(images?: string[]) {
 
 export default function TravelProductsPage() {
   const [keyword, setKeyword] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [search, setSearch] = useState("");
 
-  const { data, loading, error, refetch } = useQuery<{
+  const { data, loading, error } = useQuery<{
     fetchTravelproducts: Travelproduct[];
   }>(FETCH_TRAVELPRODUCTS, {
     variables: {
       page: 1,
-      search: "",
+      search,
     },
     ssr: false,
   });
@@ -54,12 +56,16 @@ export default function TravelProductsPage() {
 
   function onSubmitSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    void refetch({
-      page: 1,
-      search: keyword,
-    });
+    setSelectedCategory("");
+    setSearch(keyword.trim());
   }
+
+  const onClickCategory = (categoryName: string) => {
+    const nextCategory = selectedCategory === categoryName ? "" : categoryName;
+    setSelectedCategory(nextCategory);
+    setKeyword("");
+    setSearch(nextCategory);
+  };
 
   return (
     <main className={styles.page}>
@@ -116,7 +122,7 @@ export default function TravelProductsPage() {
 
         <section className={styles.promotion}>
           <div className={styles.promotionText}>
-            <span>‘솔로트립’ 독점 숙소</span>
+            <span>'솔로트립' 독점 숙소</span>
 
             <h2>
               천만 관객이 사랑한
@@ -163,7 +169,14 @@ export default function TravelProductsPage() {
 
           <div className={styles.categoryList}>
             {categories.map((category) => (
-              <button type="button" key={category}>
+              <button
+                type="button"
+                key={category}
+                className={`${styles.category} ${
+                  selectedCategory === category ? styles.activeCategory : ""
+                }`}
+                onClick={() => onClickCategory(category)}
+              >
                 <span className={styles.categoryIcon}>⌂</span>
                 <span>{category}</span>
               </button>

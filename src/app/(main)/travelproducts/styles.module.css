@@ -351,3 +351,19 @@
   font-size: 14px;
   text-align: center;
 }
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px 12px;
+}
+
+.productCard {
+  min-width: 0;
+}
+
+@media (max-width: 780px) {
+  .productGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

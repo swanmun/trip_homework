@@ -1,10 +1,15 @@
 "use client";
 
 import { useQuery } from "@apollo/client/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { FETCH_BOARDS } from "@/graphql/queries";
+import {
+  FETCH_BOARDS,
+  FETCH_BOARDS_COUNT,
+  FETCH_BOARDS_OF_THE_BEST,
+} from "@/graphql/queries";
 import type { Board } from "@/types/board";
 import styles from "./styles.module.css";
 
@@ -17,29 +22,85 @@ const CARD_IMAGES = [
 
 const formatDate = (date: string) => date.slice(0, 10).replaceAll("-", ".");
 
+const BOARDS_PER_PAGE = 10;
+const PAGES_PER_GROUP = 5;
+
 export default function BoardSection() {
   const [keyword, setKeyword] = useState("");
-  const { data, loading, error, refetch } = useQuery<{ fetchBoards: Board[] }>(
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [search, setSearch] = useState("");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [page, setPage] = useState(1);
+
+  const { data, loading, error } = useQuery<{ fetchBoards: Board[] }>(
     FETCH_BOARDS,
     {
-      variables: { page: 1, search: "" },
+      // page 또는 search가 바뀌면 Apollo가 목록을 다시 요청해요.
+      variables: {
+        page,
+        search,
+        startDate: dateRange.start || undefined,
+        endDate: dateRange.end || undefined,
+      },
       // 이 Query는 브라우저 화면이 열린 뒤 실행해요.
       ssr: false,
     },
   );
 
+  const {
+    data: countData,
+    loading: countLoading,
+    error: countError,
+  } = useQuery<{
+    fetchBoardsCount: number;
+  }>(FETCH_BOARDS_COUNT, {
+    variables: {
+      search,
+      startDate: dateRange.start || undefined,
+      endDate: dateRange.end || undefined,
+    },
+    ssr: false,
+  });
+
+  // 위쪽 카드는 일반 목록을 잘라 쓰지 않고 베스트 게시글 API로 따로 받아요.
+  const { data: bestData } = useQuery<{ fetchBoardsOfTheBest: Board[] }>(
+    FETCH_BOARDS_OF_THE_BEST,
+    { ssr: false },
+  );
+
   const boards = data?.fetchBoards ?? [];
-  // 같은 게시글 목록에서 앞의 4개만 골라 위쪽 카드에 사용해요.
-  const hotBoards = boards.slice(0, 4);
-  const displayedBoards = boards.slice(0, 10);
+  const hotBoards = bestData?.fetchBoardsOfTheBest.slice(0, 4) ?? [];
+  const totalCount = countData?.fetchBoardsCount ?? 0;
+  const lastPage = Math.ceil(totalCount / BOARDS_PER_PAGE);
+
+  // 1~5, 6~10처럼 한 화면에 페이지 번호를 5개씩 보여줘요.
+  const startPage = Math.floor((page - 1) / PAGES_PER_GROUP) * 5 + 1;
+  const pageNumbers = Array.from(
+    { length: PAGES_PER_GROUP },
+    (_, index) => startPage + index,
+  ).filter((pageNumber) => pageNumber <= lastPage);
 
   const onSubmitSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    refetch({ page: 1, search: keyword });
+
+    if (startDate && endDate && startDate > endDate) {
+      alert("시작일은 종료일보다 빠른 날짜를 선택해 주세요.");
+      return;
+    }
+
+    setPage(1);
+    setSearch(keyword.trim());
+    setDateRange({
+      start: startDate ? `${startDate}T00:00:00.000Z` : "",
+      end: endDate ? `${endDate}T23:59:59.999Z` : "",
+    });
   };
 
-  if (loading) return <p className={styles.state}>게시글을 불러오고 있어요...</p>;
-  if (error) return <p className={styles.state}>API 연결을 확인해주세요.</p>;
+  if (loading || countLoading)
+    return <p className={styles.state}>게시글을 불러오고 있어요...</p>;
+  if (error || countError)
+    return <p className={styles.state}>API 연결을 확인해주세요.</p>;
 
   return (
     <section className={styles.section}>
@@ -48,19 +109,49 @@ export default function BoardSection() {
 
         <div className={styles.cardList}>
           {hotBoards.map((board, index) => (
-            <Link className={styles.card} href={`/boards/${board._id}`} key={board._id}>
-              <img className={styles.cardImage} src={CARD_IMAGES[index]} alt="여행지" />
+            <Link
+              className={styles.card}
+              href={`/boards/${board._id}`}
+              key={board._id}
+            >
+              {/* API 이미지가 없는 게시글은 준비한 임시 이미지를 보여줘요. */}
+              <img
+                className={styles.cardImage}
+                src={
+                  board.images?.[0]
+                    ? board.images[0].startsWith("http")
+                      ? board.images[0]
+                      : `https://storage.googleapis.com/${board.images[0]}`
+                    : CARD_IMAGES[index]
+                }
+                alt="여행지"
+              />
 
               <div className={styles.cardContent}>
                 <h3>{board.title}</h3>
 
                 <p className={styles.writer}>
-                  <span className={styles.avatar}>👤</span>
+                  <span className={styles.avatar}>
+                    <Image
+                      src="/icons/person.svg"
+                      alt=""
+                      width={18}
+                      height={18}
+                    />
+                  </span>
                   {board.writer ?? "익명"}
                 </p>
 
                 <div className={styles.cardBottom}>
-                  <span>♡ {board.likeCount}</span>
+                  <span className={styles.likeCount}>
+                    <Image
+                      src="/icons/good.svg"
+                      alt=""
+                      width={18}
+                      height={18}
+                    />
+                    {board.likeCount}
+                  </span>
                   <time>{formatDate(board.createdAt)}</time>
                 </div>
               </div>
@@ -74,11 +165,32 @@ export default function BoardSection() {
 
         <div className={styles.tools}>
           <form className={styles.search} onSubmit={onSubmitSearch}>
-            {/* 날짜 검색은 모양만 먼저 만들어요. */}
-            <div className={styles.dateBox}>▣&nbsp;&nbsp; YYYY. MM. DD - YYYY. MM. DD</div>
+            <div className={styles.dateBox}>
+              <Image src="/icons/calendar.svg" alt="" width={20} height={20} />
+              <input
+                type="date"
+                value={startDate}
+                aria-label="검색 시작일"
+                onChange={(event) => setStartDate(event.target.value)}
+              />
+              <span>-</span>
+              <input
+                type="date"
+                value={endDate}
+                min={startDate}
+                aria-label="검색 종료일"
+                onChange={(event) => setEndDate(event.target.value)}
+              />
+            </div>
 
             <label className={styles.searchBox}>
-              <span>⌕</span>
+              <Image
+                className={styles.searchIcon}
+                src="/icons/search.svg"
+                alt=""
+                width={20}
+                height={20}
+              />
               <input
                 value={keyword}
                 onChange={(event) => setKeyword(event.target.value)}
@@ -86,12 +198,21 @@ export default function BoardSection() {
               />
             </label>
 
-            <button className={styles.searchButton} type="submit">검색</button>
+            <button className={styles.searchButton} type="submit">
+              검색
+            </button>
           </form>
 
-          {/* 등록 화면의 기능은 없지만, 빈 페이지로 이동하는 것부터 연습해요. */}
+          {/* 등록 화면. */}
           <Link className={styles.writeButton} href="/boards/new">
-            ▣&nbsp; 트립토크 등록
+            <Image
+              className={styles.writeIcon}
+              src="/icons/rwite.svg"
+              alt=""
+              width={20}
+              height={20}
+            />
+            트립토크 등록
           </Link>
         </div>
 
@@ -101,28 +222,69 @@ export default function BoardSection() {
             <span className={styles.titleCell}>제목</span>
             <span className={styles.writerCell}>작성자</span>
             <span className={styles.dateCell}>날짜</span>
+            <span className={styles.deleteSpace} />
           </div>
 
-          {displayedBoards.map((board, index) => (
+          {boards.map((board, index) => (
             <div className={styles.row} key={board._id}>
-              <span className={styles.number}>{243 - index}</span>
+              <span className={styles.number}>
+                {totalCount - (page - 1) * BOARDS_PER_PAGE - index}
+              </span>
               <Link className={styles.titleCell} href={`/boards/${board._id}`}>
                 {board.title}
               </Link>
-              <span className={styles.writerCell}>{board.writer ?? "익명"}</span>
-              <time className={styles.dateCell}>{formatDate(board.createdAt)}</time>
+              <span className={styles.writerCell}>
+                {board.writer ?? "익명"}
+              </span>
+              <time className={styles.dateCell}>
+                {formatDate(board.createdAt)}
+              </time>
+
+              {/* 마우스를 올려야만 삭제 아이콘이 보여요. */}
+              <button
+                className={styles.deleteButton}
+                type="button"
+                aria-label={`${board.title} 삭제`}
+              >
+                <Image src="/icons/delete.svg" alt="" width={17} height={17} />
+              </button>
             </div>
           ))}
 
-          <div className={styles.pagination}>
-            <button type="button">‹</button>
-            <button className={styles.selected} type="button">1</button>
-            <button type="button">2</button>
-            <button type="button">3</button>
-            <button type="button">4</button>
-            <button type="button">5</button>
-            <button type="button">›</button>
-          </div>
+          {boards.length === 0 && (
+            <p className={styles.empty}>검색된 게시글이 없습니다.</p>
+          )}
+
+          {lastPage > 0 && (
+            <div className={styles.pagination}>
+              <button
+                type="button"
+                disabled={startPage === 1}
+                onClick={() => setPage(startPage - 1)}
+              >
+                ‹
+              </button>
+
+              {pageNumbers.map((pageNumber) => (
+                <button
+                  className={page === pageNumber ? styles.selected : ""}
+                  type="button"
+                  key={pageNumber}
+                  onClick={() => setPage(pageNumber)}
+                >
+                  {pageNumber}
+                </button>
+              ))}
+
+              <button
+                type="button"
+                disabled={startPage + PAGES_PER_GROUP > lastPage}
+                onClick={() => setPage(startPage + PAGES_PER_GROUP)}
+              >
+                ›
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </section>

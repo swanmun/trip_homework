@@ -75,7 +75,6 @@
   justify-content: center;
   border-radius: 50%;
   background: #eeeeee;
-  font-size: 13px;
 }
 
 .cardBottom {
@@ -87,7 +86,10 @@
   font-size: 11px;
 }
 
-.cardBottom span {
+.likeCount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   color: #ff7777;
   font-size: 13px;
 }
@@ -122,10 +124,24 @@
   padding: 0 14px;
   flex-shrink: 0;
   align-items: center;
+  gap: 9px;
   border-radius: 6px;
   color: #888888;
   background: #f3f3f3;
   font-size: 13px;
+}
+
+.dateBox input {
+  width: 100px;
+  border: 0;
+  outline: 0;
+  color: #777777;
+  background: transparent;
+  font-size: 11px;
+}
+
+.dateBox input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
 }
 
 .searchBox {
@@ -139,10 +155,9 @@
   background: #f3f3f3;
 }
 
-.searchBox span {
-  color: #333333;
-  font-size: 22px;
-  line-height: 1;
+.searchIcon {
+  width: 20px;
+  height: 20px;
 }
 
 .searchBox input {
@@ -179,6 +194,11 @@
   background: #2878ef;
   font-size: 14px;
   font-weight: 700;
+  gap: 8px;
+}
+
+.writeIcon {
+  filter: brightness(0) invert(1);
 }
 
 .tableBox {
@@ -245,6 +265,24 @@
   color: #aaaaaa;
 }
 
+.deleteButton,
+.deleteSpace {
+  width: 42px;
+  flex-shrink: 0;
+}
+
+.deleteButton {
+  height: 32px;
+  border: 0;
+  opacity: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.row:hover .deleteButton {
+  opacity: 1;
+}
+
 .pagination {
   display: flex;
   margin-top: auto;
@@ -260,6 +298,12 @@
   border-radius: 7px;
   color: #777777;
   background: transparent;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.3;
+  cursor: default;
 }
 
 .pagination .selected {
@@ -270,6 +314,12 @@
 
 .state {
   padding: 100px 20px;
+  text-align: center;
+}
+
+.empty {
+  margin: 40px 0 0;
+  color: #999999;
   text-align: center;
 }
 
